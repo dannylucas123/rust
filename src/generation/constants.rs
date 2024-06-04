@@ -12,11 +12,13 @@ pub const PLAINS: MetaData = MetaData {
     entrance_cell: Cell {
         x: 0,
         y: 0,
-        of_type: Some(0),
+        of_type: 1,
+        type_representation: Some('E'),
     },
     exit_cell: Cell {
         x: 1,
         y: 1,
-        of_type: Some(0),
+        of_type: 2,
+        type_representation: Some('X'),
     },
 };

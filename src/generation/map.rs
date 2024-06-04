@@ -19,6 +19,7 @@ impl Map {
         };
         let mut metadata_instance = MetaData::new_from_const(metadata);
         let mut layout_instance = Layout::new();
+        layout_instance.populate(&mut metadata_instance);
         Map {
             meta_data: metadata_instance,
             name: location.as_str().to_string(),
@@ -30,9 +31,9 @@ impl Map {
         for row in &self.layout.cells {
             for cell in row {
                 let letter = match cell.of_type {
-                    Some(0) => " ",
-                    Some(1) => "E",
-                    Some(2) => "X",
+                    0 => " ",
+                    1 => "E",
+                    2 => "X",
                     _ => " ",
                 };
                 print!("[ {} ]", letter);
