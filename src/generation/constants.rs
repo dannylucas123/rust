@@ -1,6 +1,7 @@
 use super::layout::Cell;
 use super::metadata::MetaData;
 
+pub const _SIZE: u8 = 7;
 pub const PLAINS: MetaData = MetaData {
     liquid_block_type: 'W',
     wall_block_type: 'T',
