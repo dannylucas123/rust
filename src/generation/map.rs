@@ -28,13 +28,15 @@ impl Map {
     }
 
     pub fn print_layout(&self) {
-        for row in &self.layout.cells {
-            for cell in row {
-                let letter = match cell.of_type {
-                    0 => " ",
-                    1 => "E",
-                    2 => "X",
-                    _ => " ",
+        self.layout.bfs();
+        for column in &self.layout.cells {
+            for cell in column {
+                let letter: String = match cell.of_type {
+                    0 => " ".to_string(),
+                    _ => match cell.type_representation {
+                        Some(c) => c.to_string(),
+                        None => " ".to_string(),
+                    },
                 };
                 print!("[ {} ]", letter);
             }

@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use rand::Rng;
 
 use super::{constants::_SIZE, metadata::MetaData};
@@ -49,8 +51,8 @@ impl Layout {
                 }
 
                 cells[row as usize][column as usize] = Cell {
-                    x: row_as_u8,
-                    y: column_as_u8,
+                    x: column_as_u8,
+                    y: row_as_u8,
                     of_type: of_type,
                     type_representation: type_representation,
                 };
@@ -64,16 +66,14 @@ impl Layout {
     }
 
     fn determine_start_end() -> (Cell, Cell) {
-        let mut rng = rand::thread_rng();
-
         let entrance = Cell {
-            x: rng.gen_range(0..=_SIZE) as u8,
+            x: Self::get_single_coordinate() as u8,
             y: _SIZE - 1,
             of_type: 1,
             type_representation: Some('E'),
         };
         let exit = Cell {
-            x: rng.gen_range(0..=_SIZE) as u8,
+            x: Self::get_single_coordinate() as u8,
             y: 0,
             of_type: 2,
             type_representation: Some('X'),
@@ -84,23 +84,37 @@ impl Layout {
 
     pub(super) fn populate(&mut self, meta_data: &mut MetaData) {
         let mut current_liquid_block: Vec<Cell> = Vec::new();
+        current_liquid_block.push(self.spawn_liquid_source(meta_data.liquid_block_type));
+
+        meta_data.current_liquid_blocks = current_liquid_block.len() as u8;
+
         let mut current_wall_block: Vec<Cell> = Vec::new();
-        let result = self.spawn_liquid();
     }
 
-    fn spawn_liquid(&self) -> (u8, u8) {
-        let mut rng = rand::thread_rng();
-
+    fn spawn_liquid_source(&mut self, liquid_block_type: Option<char>) -> Cell {
         loop {
-            let source_block_x = rng.gen_range(0.._SIZE);
-            let source_block_y = rng.gen_range(0.._SIZE);
+            let row = Self::get_single_coordinate();
+            let column = Self::get_single_coordinate();
 
-            if self.is_blocked(source_block_x, source_block_y) {
+            if self.is_blocked(column, row) {
                 continue;
             }
 
-            return (source_block_x, source_block_y);
+            let cell = Cell {
+                x: column,
+                y: row,
+                of_type: 4,
+                type_representation: liquid_block_type,
+            };
+
+            self.cells[row as usize][column as usize] = cell;
+
+            return cell;
         }
+    }
+
+    fn fill_liquid(&self, cells: &mut Vec<Cell>, meta_data: &mut MetaData) {
+        let first_block = cells[0];
     }
 
     fn is_blocked(&self, x: u8, y: u8) -> bool {
@@ -113,5 +127,76 @@ impl Layout {
         }
 
         false
+    }
+
+    fn get_single_coordinate() -> u8 {
+        let mut rng = rand::thread_rng();
+        return rng.gen_range(0.._SIZE - 1);
+    }
+
+    fn is_valid_cell(&self, visited: &Vec<Vec<bool>>, x: i8, y: i8) -> bool {
+        let border: i8 = self.cells.len() as i8 - 1;
+        // Make sure we don't go below 0
+        if (x < 0) || (y < 0) {
+            return false;
+        }
+
+        // Or above the maximum size of the vec
+        if (x > border) || (y > border) {
+            return false;
+        }
+
+        // If it is already visited, we don't have to touch it again
+        if visited[y as usize][x as usize] {
+            return false;
+        }
+
+        // See if the adjacent cell is a traversable cell
+        let is_type = self.cells[y as usize][x as usize].of_type;
+        if is_type > 2 {
+            return false;
+        }
+
+        true
+    }
+
+    pub(super) fn bfs(&self) -> bool {
+        // left, right, up, down
+        let directions: [(i8, i8); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
+
+        let start = &self.entrance;
+
+        // According to the all knowning Chat Gippity it is preferable to use VecDeque in these situations, because it
+        // optimizes push_front and whatnot.
+        let mut queue: VecDeque<(u8, u8)> = VecDeque::new();
+        // We will mark the nodes we have visited, so we don't check those again.
+        let mut visited = vec![vec![false; AS_USIZE]; AS_USIZE];
+        // Add the starting node of the map to the vec.
+        queue.push_front((start.x, start.y));
+        // Mark the starting cell as visited.
+        visited[start.x as usize][start.y as usize] = true;
+        // While there is still a tuple of coordinates in the queue, process it.
+        while let Some(cell) = queue.pop_front() {
+            // We're gonna check if we can go up, right, down, left. If possible, we add it to the queue.
+            let ix = cell.0 as i8;
+            let iy = cell.1 as i8;
+
+            for &(x, y) in &directions {
+                let new_x = ix + x;
+                let new_y = iy + y;
+
+                if self.is_valid_cell(&visited, new_x, new_y) {
+                    let next = ((ix + x) as u8, (iy + y) as u8);
+                    visited[new_y as usize][new_x as usize] = true;
+                    queue.push_back(next);
+                }
+            }
+        }
+
+        for row in &visited {
+            println!("{:?}", row);
+        }
+        // lastly we check if the exit has been traversed.
+        visited[self.exit.y as usize][self.exit.x as usize]
     }
 }

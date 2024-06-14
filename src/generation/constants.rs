@@ -1,10 +1,10 @@
 use super::layout::Cell;
 use super::metadata::MetaData;
 
-pub const _SIZE: u8 = 7;
-pub const PLAINS: MetaData = MetaData {
-    liquid_block_type: 'W',
-    wall_block_type: 'T',
+pub const _SIZE: u8 = 3;
+pub(super) const PLAINS: MetaData = MetaData {
+    liquid_block_type: Some('W'),
+    wall_block_type: Some('T'),
     max_liquid_blocks: 6,
     max_wall_blocks: 10,
     current_liquid_blocks: 0,

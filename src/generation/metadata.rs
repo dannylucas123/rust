@@ -2,8 +2,8 @@ use super::layout::Cell;
 
 #[derive(Clone, Copy)]
 pub(super) struct MetaData {
-    pub(super) liquid_block_type: char,
-    pub(super) wall_block_type: char,
+    pub(super) liquid_block_type: Option<char>,
+    pub(super) wall_block_type: Option<char>,
     pub(super) max_liquid_blocks: u8,
     pub(super) max_wall_blocks: u8,
     pub(super) current_liquid_blocks: u8,
