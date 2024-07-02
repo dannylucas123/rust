@@ -5,6 +5,7 @@ use rand::Rng;
 use super::{constants::_SIZE, metadata::MetaData};
 
 const AS_USIZE: usize = _SIZE as usize;
+
 #[derive(Clone, Copy, Default)]
 pub(super) struct Cell {
     pub x: u8,
@@ -167,7 +168,7 @@ impl Layout {
         let start = &self.entrance;
 
         // According to the all knowning Chat Gippity it is preferable to use VecDeque in these situations, because it
-        // optimizes push_front and whatnot.
+        // optimizes push/pop_front and whatnot.
         let mut queue: VecDeque<(u8, u8)> = VecDeque::new();
         // We will mark the nodes we have visited, so we don't check those again.
         let mut visited = vec![vec![false; AS_USIZE]; AS_USIZE];
