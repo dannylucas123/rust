@@ -1,9 +1,14 @@
+use inventory::_i::Inventory;
+use items::gear::Gear;
+
 pub struct Player {
     name: String,
     level: u8,
     experience_multiplier: Option<u8>,
     attack: u8,
     defense: u8,
+    gear: Gear,
+    inventory: Inventory,
 }
 
 impl Player {
@@ -14,9 +19,15 @@ impl Player {
             experience_multiplier: None,
             attack: 1,
             defense: 1,
+            gear: Gear::new(),
+            inventory: Inventory::new(),
         };
         player.set_level(level);
         return player;
+    }
+
+    pub fn set_weapon(&mut self) {
+        self.gear.equip_weapon();
     }
 
     pub fn set_level(&mut self, new_level: u8) {
@@ -40,5 +51,10 @@ impl Player {
             "The player {:?} has achieved level {:?}",
             self.name, self.level
         )
+    }
+
+    pub fn calculate_stats(&mut self) {
+        self.attack = self.gear.weapon.attack;
+        println!("Attack Power: {}", self.attack);
     }
 }

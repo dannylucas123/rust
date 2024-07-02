@@ -3,5 +3,7 @@
 members = [
     "generation",
     "player",
-    "binary"
+    "binary",
+    "items",
+    "inventory"
 ]

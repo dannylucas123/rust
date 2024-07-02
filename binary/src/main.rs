@@ -26,6 +26,12 @@ fn main() {
             break;
         }
 
+        if trimmed_input == "nozarashi" {
+            new_player.set_weapon();
+            new_player.calculate_stats();
+            continue;
+        }
+
         println!("You said: {}", trimmed_input);
     }
 }
